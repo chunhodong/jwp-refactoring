@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+@Table(name = "order_line_item")
 public class OrderLineItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

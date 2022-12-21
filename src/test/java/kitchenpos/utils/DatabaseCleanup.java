@@ -31,15 +31,25 @@ public class DatabaseCleanup implements InitializingBean {
     @Transactional
     public void execute() {
         entityManager.flush();
-        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY FALSE").executeUpdate();
 
-        for (String tableName : tableNames) {
-            if(tableName.equals("order"))tableName = "orders";
-            entityManager.createNativeQuery("TRUNCATE TABLE " + tableName).executeUpdate();
-            initAutoIncrement(tableName);
-        }
+        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0;").executeUpdate();
 
-        entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
+        entityManager.createNativeQuery("TRUNCATE TABLE menu;").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE menu ALTER COLUMN id RESTART WITH 1;").executeUpdate();
+
+        entityManager.createNativeQuery("TRUNCATE TABLE menu_group;").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE menu_group ALTER COLUMN id RESTART WITH 1;").executeUpdate();
+
+        entityManager.createNativeQuery("TRUNCATE TABLE menu_product;").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE menu_product ALTER COLUMN seq RESTART WITH 1;").executeUpdate();
+
+        entityManager.createNativeQuery("TRUNCATE TABLE product;").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE product ALTER COLUMN id RESTART WITH 1;").executeUpdate();
+
+        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1;").executeUpdate();
+
+
+        //entityManager.createNativeQuery("SET REFERENTIAL_INTEGRITY TRUE").executeUpdate();
     }
 
     private void initAutoIncrement(String tableName) {

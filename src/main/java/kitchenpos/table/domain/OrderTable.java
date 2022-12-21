@@ -10,6 +10,7 @@ import java.util.Objects;
 import static kitchenpos.table.exception.OrderTableExceptionType.*;
 
 @Entity
+@Table(name = "order_table")
 public class OrderTable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

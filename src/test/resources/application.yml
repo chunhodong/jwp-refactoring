@@ -1,0 +1,12 @@
+spring:
+  profiles:
+    active: local
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mysql://test

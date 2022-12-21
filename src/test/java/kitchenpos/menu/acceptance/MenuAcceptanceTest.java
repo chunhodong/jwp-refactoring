@@ -9,11 +9,19 @@ import kitchenpos.menu.dto.MenuProductRequest;
 import kitchenpos.menu.dto.MenuRequest;
 import kitchenpos.menu.dto.MenuResponse;
 import kitchenpos.product.dto.ProductResponse;
+import kitchenpos.utils.DatabaseCleanup;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -25,7 +33,23 @@ import static kitchenpos.product.acceptance.ProductAcceptance.상품_생성을_�
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class MenuAcceptanceTest extends AcceptanceTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Testcontainers
+public class MenuAcceptanceTest  {
+
+    @LocalServerPort
+    int port;
+
+    @Container
+    static final MySQLContainer postgreSQLContainer = new MySQLContainer("mysql:8")
+            .withDatabaseName("test2");
+
+    static {
+        postgreSQLContainer.start();
+    }
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
 
     private MenuGroupResponse 치킨;
     private ProductResponse 닭다리;
@@ -34,11 +58,17 @@ public class MenuAcceptanceTest extends AcceptanceTest {
 
     @BeforeEach
     public void setUp() {
-        super.setUp();
+        RestAssured.port = port;
         닭다리 = 상품_생성을_요청("닭다리", new BigDecimal(25000)).as(ProductResponse.class);
         소스 = 상품_생성을_요청("소스", new BigDecimal(18000)).as(ProductResponse.class);
         메뉴상품 = Arrays.asList(new MenuProductRequest(닭다리.getId(), 1L), new MenuProductRequest(소스.getId(), 2L));
         치킨 = 메뉴그룹_생성을_요청("치킨").as(MenuGroupResponse.class);
+    }
+
+    @AfterEach
+    public void afterSetup(){
+        databaseCleanup.execute();
+
     }
 
     @DisplayName("메뉴를 생성한다")

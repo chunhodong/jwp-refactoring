@@ -6,17 +6,52 @@ import io.restassured.response.Response;
 import kitchenpos.AcceptanceTest;
 import kitchenpos.product.dto.ProductRequest;
 import kitchenpos.product.dto.ProductResponse;
+import kitchenpos.utils.DatabaseCleanup;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ProductAcceptance extends AcceptanceTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@Testcontainers
+public class ProductAcceptance {
+
+
+    @LocalServerPort
+    int port;
+
+    @Container
+    static final MySQLContainer postgreSQLContainer = new MySQLContainer("mysql:8")
+            .withDatabaseName("test0");
+
+
+    static {
+        postgreSQLContainer.start();
+    }
+
+
+    @Autowired
+    private DatabaseCleanup databaseCleanup;
+
+    @BeforeEach
+    public void setUp() {
+        RestAssured.port = port;
+        databaseCleanup.execute();
+    }
+
 
     @DisplayName("상품을 생성한다")
     @Test

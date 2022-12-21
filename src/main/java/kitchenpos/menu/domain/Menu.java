@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 @Entity
+@Table(name = "menu")
 public class Menu {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
